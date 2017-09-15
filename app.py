@@ -2,6 +2,7 @@ import telepot
 import pprint
 import telepot.loop
 import os
+import time
 from PIL import Image, features
 import tesserocr
 
@@ -17,7 +18,8 @@ def handle(msg):
         bot.download_file(msg['sticker']['file_id'], os.path.join(path,filename))
         img = Image.open('temp.webp')
         text = tesserocr.image_to_text(img)
-        bot.sendMessage(msg['chat']['id'], text)
+        if text:
+            bot.sendMessage(msg['chat']['id'], text)
 
 pprint.pprint(tesserocr.get_languages())
 pprint.pprint(bot.getMe())
