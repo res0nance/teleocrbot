@@ -18,6 +18,7 @@ def handle(msg):
         bot.download_file(msg['sticker']['file_id'], os.path.join(path,filename))
         img = Image.open('temp.webp')
         text = tesserocr.image_to_text(img)
+        text = text.strip()
         if text:
             bot.sendMessage(msg['chat']['id'], text)
 
