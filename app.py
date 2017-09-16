@@ -9,18 +9,33 @@ import tesserocr
 telegram_botid = 'TELEGRAM_BOTID'
 
 bot = telepot.Bot(telegram_botid)
+path = os.path.dirname(__file__)
 
 def handle(msg):
     pprint.pprint(msg)
     if( 'sticker' in msg ):
-        path = os.path.dirname(__file__)
         filename = 'temp.webp'
         bot.download_file(msg['sticker']['file_id'], os.path.join(path,filename))
-        img = Image.open('temp.webp')
+        img = Image.open(filename)
         text = tesserocr.image_to_text(img)
         text = text.strip()
+        pprint.pprint(text)
         if text:
             bot.sendMessage(msg['chat']['id'], text)
+    if( 'document' in msg ):
+        filename = ''
+        if( msg['document']['mime_type'] == 'image/jpeg'):
+            filename = 'temp.jpg'
+        if( msg['document']['mime_type'] == 'image/png'):
+            filename = 'temp.png'
+        if filename:
+            bot.download_file(msg['document']['file_id'], os.path.join(path,filename))
+            img = Image.open(filename)
+            text = tesserocr.image_to_text(img)
+            text = text.strip()
+            pprint.pprint(text)
+            if text:
+                bot.sendMessage(msg['chat']['id'], text)
 
 pprint.pprint(tesserocr.get_languages())
 pprint.pprint(bot.getMe())
