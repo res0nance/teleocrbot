@@ -38,7 +38,7 @@ def handle(msg):
                 bot.sendMessage(msg['chat']['id'], text)
     if( 'photo' in  msg ):
         filename = 'temp.jpg'
-        bot.donwload_file(msg['photo'][-1]['file_id'], os.path.join(path,filename))
+        bot.download_file(msg['photo'][-1]['file_id'], os.path.join(path,filename))
         img = Image.open(filename)
         text = tesserocr.image_to_text(img)
         text = text.strip()
