@@ -19,6 +19,7 @@ def sendReply(msg,text):
 
 def runOCR(filename,lang):
     img = Image.open(filename)
+    pprint.pprint('Start OCR on image with language set ' + lang)
     text = tesserocr.image_to_text(img, lang=lang)
     text = text.strip()
     pprint.pprint(text)
@@ -54,6 +55,7 @@ def processOCR(msg, lang):
             sendReply(msg,text)
         else:
             sendReply(msg,failedOCR)
+
 def handle(msg):
     pprint.pprint(msg)
     commandtext = msg['text']
