@@ -12,6 +12,7 @@ bot = telepot.Bot(telegram_botid)
 path = os.path.dirname(__file__)
 supported_lang = ""
 languages = []
+failedOCR = "Could not recognize any characters sorry :("
 
 def sendReply(msg,text):
     bot.sendMessage(msg['chat']['id'], text, reply_to_message_id = msg['message_id'])
@@ -30,6 +31,8 @@ def processOCR(msg, lang):
         text = runOCR(filename,lang)
         if text:
             sendReply(msg,text)
+        else:
+            sendReply(msg,failedOCR)
     if( 'document' in msg ):
         filename = ''
         if( msg['document']['mime_type'] == 'image/jpeg'):
@@ -41,29 +44,37 @@ def processOCR(msg, lang):
             text = runOCR(filename,lang)
             if text:
                 sendReply(msg,text)
+            else:
+                sendReply(msg,failedOCR)
     if( 'photo' in  msg ):
         filename = 'temp.jpg'
         bot.download_file(msg['photo'][-1]['file_id'], os.path.join(path,filename))
         text = runOCR(filename, lang)
         if text:
-            bot.sendMessage(msg['chat']['id'], text, reply_to_message_id = msg['message_id'])
-
+            sendReply(msg,text)
+        else:
+            sendReply(msg,failedOCR)
 def handle(msg):
     pprint.pprint(msg)
     commandtext = msg['text']
     commandtext = command.strip()
     if not commandtext:
         return
-    commands = commands.split()
+    commands = commandtext.split()
     arglen = len(commands)
-    if arglen == 1 and command[0] == '/lang':
+    if arglen == 1 and commands[0] == '/lang':
         bot.sendMessage(msg['chat']['id'], supported_lang, reply_to_message_id = msg['message_id'])
-    if arglen == 2 and command[0] == '/OCR' and command[1] in languages:
+    if arglen == 2 and commands[0] == '/ocr':
+        if commands[1] not in languages:
+            sendReply(msg,"Unsupported language specified")
+            return
         if 'reply_to_message' in msg:
-            processOCR(msg['reply_to_message'], command[1])
+            processOCR(msg['reply_to_message'], commands[1])
+        else:
+            sendReply(msg, "Must be used in reply to a picture based message")
 
 language = tesserocr.get_languages()
-for lang in language:
+for lang in language[1]:
     if lang != 'osd' and lang != 'equ':
         languages.append(lang)
 
