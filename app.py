@@ -59,7 +59,7 @@ def processOCR(msg, lang):
 def handle(msg):
     pprint.pprint(msg)
     commandtext = msg['text']
-    commandtext = command.strip()
+    commandtext = commandtext.strip()
     if not commandtext:
         return
     commands = commandtext.split()
